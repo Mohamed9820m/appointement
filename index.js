@@ -2,7 +2,16 @@ const puppeteer = require('puppeteer');
 
 (async () => {
   // Launch the browser
-  const browser = await puppeteer.launch({ headless: false }); // Set headless: true for background execution
+  // const browser = await puppeteer.launch({ headless: false }); // Set headless: true for background execution
+
+  const browser = await puppeteer.launch({
+    args : [
+      "--disable-setuid-sandbox",
+      "--no-sandbox",
+      "--single-process",
+      "--no-zygote"
+    ]
+   }); 
   const page = await browser.newPage();
 
   // Navigate to the login page
