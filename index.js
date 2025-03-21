@@ -52,7 +52,7 @@ bot.onText(/\/start/, async (msg) => {
     console.log('Checking login status...');
     const url = page.url();
     console.log('Current URL:', url); // Log the URL for debugging
-    if (url.includes('/UserArea')) {
+    if (url.includes('/Home/Login')) {
       console.log('Login successful!');
       bot.sendMessage(chatId, '✅ Login successful!');
     } else {
