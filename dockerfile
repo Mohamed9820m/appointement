@@ -2,6 +2,7 @@ FROM ghcr.io/puppeteer/puppeteer:24.4.0
 
 # We don't need the standalone Chromium
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 # Set the working directory inside the container
 WORKDIR /usr/src/app
