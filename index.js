@@ -32,43 +32,26 @@ bot.onText(/\/start/, async (msg) => {
     const page = await browser.newPage();
 
     console.log('Navigating to login page...');
-
-    // Navigate to the login page
-    await page.goto('https://prenotami.esteri.it/');
-
-    // Wait for the login form to load
-    await page.waitForSelector('input[name="Email"]');
-
-    // Fill in the login form
-    await page.type('input[name="Email"]', 'mohamedhabibmarouani8@gmail.com'); // Replace with your email
-    await page.type('input[name="Password"]', 'MED9820med'); // Replace with your password
-
-    // Extract hidden field values (if dynamically generated)
-    const hiddenFields = await page.evaluate(() => {
-      const fields = {};
-      document.querySelectorAll('input[type="hidden"]').forEach((input) => {
-        fields[input.name] = input.value;
-      });
-      return fields;
-    });
-
-    console.log('Hidden Fields:', hiddenFields);
-
-    // Submit the form and wait for navigation
-    try {
-      await Promise.all([
-        page.waitForNavigation(), // Wait for navigation
-        page.click('button[type="submit"]'), // Trigger navigation
-      ]);
-    } catch (error) {
-      console.error('Navigation error:', error);
-      bot.sendMessage(chatId, 'An error occurred during navigation.');
-      await browser.close();
-      return;
-    }
-
-    // Check if login was successful
+    await page.goto('https://prenotami.esteri.it/', { waitUntil: 'networkidle2', timeout: 60000 });
+    
+    console.log('Waiting for email input...');
+    await page.waitForSelector('input[name="Email"]', { timeout: 60000 });
+    
+    console.log('Filling in email...');
+    await page.type('input[name="Email"]', 'mohamedhabibmarouani8@gmail.com');
+    
+    console.log('Filling in password...');
+    await page.type('input[name="Password"]', 'MED9820med');
+    
+    console.log('Submitting form...');
+    await Promise.all([
+      page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 60000 }),
+      page.click('button[type="submit"]'),
+    ]);
+    
+    console.log('Checking login status...');
     const url = page.url();
+    console.log('Current URL:', url); // Log the URL for debugging
     if (url.includes('/UserArea')) {
       console.log('Login successful!');
       bot.sendMessage(chatId, '✅ Login successful!');
