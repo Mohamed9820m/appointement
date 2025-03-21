@@ -1,7 +1,7 @@
 FROM ghcr.io/puppeteer/puppeteer:24.4.0
 
-# Install Google Chrome (and any dependencies required by Puppeteer)
-RUN apt-get update && apt-get install -y \
+# Install required dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     ca-certificates \
     fontconfig \
@@ -22,23 +22,28 @@ RUN apt-get update && apt-get install -y \
     libxdamage1 \
     libxrandr2 \
     xdg-utils \
-    google-chrome-stable
+    && rm -rf /var/lib/apt/lists/*
 
-# Set environment variables for Puppeteer
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
+# Manually set Puppeteer to use system Chrome instead of downloading its own
+RUN npm config set puppeteer_skip_chromium_download true
+
+# Set Puppeteer executable path
+ENV PUPPETEER_EXECUTABLE_PATH="/usr/bin/google-chrome"
 
 # Set the working directory inside the container
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json to the container
-COPY package*.json /usr/src/app/
+# Copy package.json and package-lock.json before installing dependencies
+COPY package*.json ./
 
 # Install dependencies
-RUN npm ci
+RUN npm ci --omit=dev
 
 # Copy the rest of the app into the container
-COPY . /usr/src/app/
+COPY . .
+
+# Expose necessary ports if required
+EXPOSE 3000
 
 # Start the application
 CMD ["node", "index.js"]
